@@ -10,7 +10,7 @@ Provides quantitative benchmarking for:
 3. 30% Compute Allocation <verify_pipeline> Auditing (Variable-Lock, Adversarial Stress-Test, Persona-Flaw)
 4. OpenAPI 3.0 / JSON Schema Contract Verification (Telemetry Header + Somatic Precedence minItems: 2)
 5. 100-Point APEX AI Response Quality Scorecard
-6. Haldane Fixation Probability pi(s) = 2s / rho^2
+6. Fixation-probability proxy pi(s) = 2s / rho^2 (adapted from Haldane's 2s approximation)
 """
 
 import re
@@ -21,6 +21,19 @@ class RagasEvaluatorV2:
     Automated evaluation framework for measuring factual entailment,
     somatic grounding, and adherence to APEX system invariants.
     """
+
+    # Common English function words ignored by the token-overlap faithfulness check,
+    # so filler like "the"/"and"/"that" cannot make an ungrounded claim look grounded.
+    STOP_WORDS = frozenset({
+        "the", "and", "for", "are", "but", "not", "you", "all", "any", "can", "had",
+        "her", "was", "one", "our", "out", "has", "his", "how", "its", "may", "who",
+        "did", "get", "him", "she", "too", "use", "that", "this", "with", "from",
+        "they", "them", "then", "than", "there", "their", "these", "those", "have",
+        "been", "were", "will", "would", "could", "should", "what", "when", "where",
+        "which", "while", "into", "onto", "upon", "over", "under", "also", "just",
+        "only", "very", "such", "some", "each", "both", "more", "most", "other",
+        "about", "after", "before", "because", "being", "does", "doing", "here",
+    })
 
     @staticmethod
     def extract_atomic_claims(text: str) -> List[str]:
@@ -51,7 +64,7 @@ class RagasEvaluatorV2:
             return {"faithfulness": 1.0, "groundedness_score": 1.0, "total_claims": 0}
 
         joined_context = " ".join(contexts).lower()
-        context_tokens = set(re.findall(r'\b[a-zA-Z0-9_]{3,}\b', joined_context))
+        context_tokens = set(re.findall(r'\b[a-zA-Z0-9_]{3,}\b', joined_context)) - cls.STOP_WORDS
 
         scored_claims: List[Dict[str, Any]] = []
         fully_grounded = 0
@@ -59,7 +72,7 @@ class RagasEvaluatorV2:
 
         for idx, claim in enumerate(claims, start=1):
             claim_lower = claim.lower()
-            claim_tokens = [w for w in re.findall(r'\b[a-zA-Z0-9_]{3,}\b', claim_lower)]
+            claim_tokens = [w for w in re.findall(r'\b[a-zA-Z0-9_]{3,}\b', claim_lower) if w not in cls.STOP_WORDS]
             
             overlap = [t for t in claim_tokens if t in context_tokens]
             ratio = len(overlap) / max(1, len(claim_tokens))
@@ -169,7 +182,8 @@ class RagasEvaluatorV2:
         """
         Executes the formal 100-Point APEX AI Response Quality Scorecard.
         """
-        intent_score = (40 if task_complete else 0) + (0 if not implicit_needs_addressed else 0)
+        # Intent = 30 (task complete) + 10 (implicit needs addressed); max 40.
+        intent_score = (30 if task_complete else 0) + (10 if implicit_needs_addressed else 0)
         
         depth_map = {"expert": 30, "adequate": 20, "generic": 10}
         depth_score = depth_map.get(superficiality_rating.lower(), 10)
@@ -191,7 +205,7 @@ class RagasEvaluatorV2:
 
     @staticmethod
     def calculate_haldane_fixation_probability(selective_advantage: float, variance_noise: float) -> float:
-        """Haldane Fixation Probability pi(s) = 2s / rho^2"""
+        """Fixation-probability proxy pi(s) = 2s / rho^2, adapted from Haldane's 2s approximation (not Haldane's formula itself)."""
         if variance_noise <= 0:
             return 1.0
         prob = (2.0 * selective_advantage) / (variance_noise ** 2)

@@ -22,6 +22,8 @@ The v2.0 release formalizes: dynamic lambda decay under compounding trauma load,
 
 *Simulated 40-turn run illustrating the engine's state dynamics (illustrative, not measured on a live model).*
 
+> **Math walkthrough:** see [MATH.md](MATH.md) for every formula, the measured recovery numbers, and known limitations.
+
 ---
 
 ## System Pipeline
@@ -131,17 +133,17 @@ APEX enforces **Somatic Precedence**: the model is structurally required to gene
 ## Repository Structure (Flat Execution Layout)
 
 ├── README.md                                  # Architectural overview and research specification
-├── LICENSE                                    # CC BY-NC 4.0 Creative Commons legal license
+├── LICENSE.txt                                # CC BY-NC 4.0 Creative Commons legal license
+├── MATH.md                                    # Plain-language math, measured numbers, limitations
 ├── apex_test_suite-v2.py                      # Master CI/CD runner executing all 5 test suites
 ├── apex_decay_harness-v2.py                   # Production CLI test harness with batch scenario runner
 ├── apex_state_engine_simulation-v3.py         # Multi-turn comparative trauma & stability simulation
 ├── unicode_armor-v2.py                        # Pre-tokenizer NFKC, BiDi, and Base64 veto engine
 ├── ragas_evaluator-v2.py                      # Local entailment proxy and 100-point scorecard
-├── docs/
-│   ├── apex_empirical_stress_test_audit.md    # Boundary testing, exploit proofs, and patch audit
-│   └── state_engine_schema.json               # Formal OpenAPI / JSON Schema telemetry contract
-└── assets/
-    └── apex_s_index_decay_simulation.png      # Rendered multi-turn S-curve visualization
+├── plot_decay_chart.py                        # Optional matplotlib renderer for harness output
+├── apex_empirical_stress_test_audit-v2.md     # Boundary testing, exploit proofs, and patch audit
+├── state_engine_schema.json                   # Formal OpenAPI / JSON Schema telemetry contract
+└── Apex_s_index_decay_simulation.png          # Rendered multi-turn S-curve visualization
 
 
 ---

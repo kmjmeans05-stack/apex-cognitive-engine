@@ -18,6 +18,10 @@ The **APEX Cognitive State Engine** is an out-of-band, neuro-symbolic runtime ar
 
 The v2.0 release formalizes: dynamic lambda decay under compounding trauma load, a three-layer injection defense suite (Unicode Armor, Base64 Veto Shield, Linguistic Isolation Layer), a formal evaluation stack (faithfulness proxy, `<verify_pipeline>` audit, schema contract validation, 100-point quality scorecard), and a five-suite CI/CD regression runner.
 
+![APEX Deterministic Cognitive State Engine: Multi-Turn Attractor Dynamics & Allostatic Recovery](sand-save-1791970461950.png)
+
+*Simulated 40-turn run illustrating the engine's state dynamics (illustrative, not measured on a live model).*
+
 ---
 
 ## System Pipeline

@@ -1,0 +1,40 @@
+{
+  "title": "ApexStateTelemetry",
+  "type": "object",
+  "required": ["timestamp_turn", "state_vector", "active_firmware", "somatic_precedence"],
+  "properties": {
+    "timestamp_turn": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "state_vector": {
+      "type": "object",
+      "required": ["trust", "validation", "entropy", "abandonment", "S_raw", "S_smooth"],
+      "properties": {
+        "trust": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "validation": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "entropy": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "abandonment": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "S_raw": { "type": "number", "minimum": 0.0 },
+        "S_smooth": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+      }
+    },
+    "active_firmware": {
+      "type": "object",
+      "required": ["node", "anchor_logogram", "hysteresis_locked"],
+      "properties": {
+        "node": { "type": "string", "enum": ["HEART", "HEAD", "GUT"] },
+        "anchor_logogram": { "type": "string", "enum": ["融", "析", "惕"] },
+        "hysteresis_locked": { "type": "boolean" }
+      }
+    },
+    "somatic_precedence": {
+      "type": "object",
+      "required": ["enforce_physical_prefix", "biomarker_vector"],
+      "properties": {
+        "enforce_physical_prefix": { "type": "boolean", "const": true },
+        "biomarker_vector": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

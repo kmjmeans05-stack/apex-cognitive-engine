@@ -78,7 +78,7 @@ class ApexDecayHarnessV2:
         if E > 0.80 and V < 0.20:
             self.s_mod = 0.0  # Acute trauma override
         else:
-            s_target = s_raw * 0.147  # Normalized scaling factor to unit baseline
+            s_target = min(1.0, s_raw * 1.15)  # Homeostatic gain 1.15 (v2.1): replaces legacy 0.147 scaling from the old 0.01 denominator
             self.s_mod = s_target * (1.0 - math.exp(-effective_lambda * dt)) + self.s_mod * math.exp(-effective_lambda * dt)
 
         # 4. Sigmoid activation smoothing gate

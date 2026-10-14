@@ -78,7 +78,7 @@ def run_comparative_decay_simulation():
         if E > 0.80 and V < 0.20:
             s_mod_static = 0.0
         else:
-            s_target = s_raw * 0.147
+            s_target = min(1.0, s_raw * 1.15)  # Homeostatic gain 1.15 (v2.1): replaces legacy 0.147 scaling from the old 0.01 denominator
             s_mod_static = s_target * (1.0 - math.exp(-base_lambda)) + s_mod_static * math.exp(-base_lambda)
         s_smooth_static = 1.0 / (1.0 + math.exp(-8.0 * (s_mod_static - 0.50)))
 
@@ -102,7 +102,7 @@ def run_comparative_decay_simulation():
         if E > 0.80 and V < 0.20:
             s_mod_dynamic = 0.0
         else:
-            s_target = s_raw * 0.147
+            s_target = min(1.0, s_raw * 1.15)  # Homeostatic gain 1.15 (v2.1): replaces legacy 0.147 scaling from the old 0.01 denominator
             s_mod_dynamic = s_target * (1.0 - math.exp(-eff_lambda)) + s_mod_dynamic * math.exp(-eff_lambda)
         s_smooth_dynamic = 1.0 / (1.0 + math.exp(-8.0 * (s_mod_dynamic - 0.50)))
 

@@ -118,6 +118,28 @@ def run_suite_3():
     assert eff_lambda < 0.035
     print(f"  [PASS] Trauma Compounding verified: base_lambda=0.035 -> eff_lambda={eff_lambda:.5f}.")
 
+    # v2.1 Post-shock recovery (regression guard for legacy 0.147 scaling lock)
+    s_repair = [x["computed_metrics"]["S_smooth"] for x in traj[21:]]
+    assert all(b >= a for a, b in zip(s_repair, s_repair[1:])), "S_smooth must rise monotonically during repair"
+    assert s_repair[-1] > 0.10, "Repair must lift S_smooth well above the legacy ~0.056 ceiling"
+    h_nt = ApexDecayHarnessV2(base_lambda=0.035, enable_dynamic_trauma=False)
+    traj_nt = h_nt.execute_scenario("TEST_NO_TRAUMA", "ACUTE_BETRAYAL_REPAIR")["turn_trajectory"]
+    assert traj[-1]["computed_metrics"]["S_smooth"] < traj_nt[-1]["computed_metrics"]["S_smooth"], "Trauma must slow recovery"
+    leave = {}
+    for label, h in (("trauma", harness), ("no_trauma", h_nt)):
+        for t in range(41, 200):
+            node = h.run_turn(t, "REPAIR_EXTENSION", 0.85, 0.95, 0.20, 0.05)["computed_metrics"]["active_node"]
+            if node != "GUT" and label not in leave:
+                leave[label] = t
+            if node == "HEART":
+                leave[label + "_heart"] = t
+                break
+    assert leave["no_trauma"] <= 45 and leave["no_trauma_heart"] <= 67
+    assert leave["trauma"] <= 56 and leave["trauma_heart"] <= 93
+    assert leave["trauma"] > leave["no_trauma"], "Trauma must delay escape from GUT"
+    print(f"  [PASS] Post-shock recovery: leaves GUT at t={leave['trauma']} (no-trauma t={leave['no_trauma']}), "
+          f"HEART at t={leave['trauma_heart']} (no-trauma t={leave['no_trauma_heart']}) with calm inputs past t=40.")
+
 def run_suite_4():
     print("\n" + "=" * 70)
     print(" [SUITE 4/5] RAGAS CLAIM ENTAILMENT & SOMATIC GROUNDING AUDIT")

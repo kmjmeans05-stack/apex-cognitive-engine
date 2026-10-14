@@ -43,7 +43,7 @@ The v2.0 release formalizes: dynamic lambda decay under compounding trauma load,
 |  lambda_eff = max(0.005, lambda_base * (1 - L))               |
 |  S_mod   = s_target*(1 - e^(-lambda_eff*dt))                  |
 |          + S_mod * e^(-lambda_eff*dt)                         |
-|  where s_target = S_raw * 0.147                               |
+|  where s_target = min(1.0, S_raw * 1.15)                      |
 +-------------------------------+-------------------------------+
                                 v
 +---------------------------------------------------------------+
@@ -181,6 +181,10 @@ We invite collaboration with:
 3. **Affective Computing & Clinical Human-AI Interaction Labs:** To evaluate non-sycophantic companions as co-regulatory anchors for neurodivergent populations (ADHD, BPD, PTSD).
 
 ---
+
+## Changelog
+
+* **v2.1** — Fixed legacy 0.147 scaling that prevented recovery. `s_target = S_raw * 0.147` (a leftover from the old 0.01 denominator) capped $S_{smooth}$ at ~0.056, so the engine could never leave GUT. It is replaced by a homeostatic gain: `s_target = min(1.0, S_raw * 1.15)`. With the fix, the 40-turn `ACUTE_BETRAYAL_REPAIR` scenario still ends in GUT (the repair window is too short), but $S_{smooth}$ climbs throughout repair (final 0.117 with trauma, 0.239 with `--disable-trauma`). If you keep feeding calm inputs past turn 40, the engine leaves GUT at turn 56 (with trauma) or 45 (without) and reaches HEART at turn 93 or 67.
 
 ## Citation & Intellectual Provenance
 
